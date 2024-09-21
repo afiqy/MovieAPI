@@ -110,13 +110,13 @@ You can use Redis for caching by using a **free Redis Cloud instance** from [Red
     redis-12345.c9.us-east-1-2.ec2.cloud.redislabs.com:16379
     ```
 3. **Add the connection string** to your `appsettings.json` under the `Redis` section:
-```json
-"Redis": {
-  "ConnectionString": "redis-12345.c9.us-east-1-2.ec2.cloud.redislabs.com:16379,password=your_password_here"
-}
+    ```json
+    "Redis": {
+    "ConnectionString": "redis-12345.c9.us-east-1-2.ec2.cloud.redislabs.com:16379,password=your_password_here"
+    }
+    ```
 
-
-##Running the Application
+## Running the Application
 
 1. **Run the API:**
     To run the API locally:
@@ -131,7 +131,7 @@ You can use Redis for caching by using a **free Redis Cloud instance** from [Red
         https://localhost:7055/swagger
     ```
 
-##Testing with Swagger
+## Testing with Swagger
 1. **Login via AWS Cognito:**
     Use the /api/auth/login endpoint to authenticate and get an Access Token.
 2. **Authorize in Swagger:**
