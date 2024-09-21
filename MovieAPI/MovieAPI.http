@@ -1,0 +1,66 @@
+@MovieAPI_HostAddress = http://localhost:5048
+
+###
+# 1. Register a New User
+POST {{MovieAPI_HostAddress}}/api/auth/register
+Content-Type: application/json
+
+{
+  "username": "testuser",
+  "password": "TestPassword123!"
+}
+
+###
+
+# 2. Login and Get JWT Token
+POST {{MovieAPI_HostAddress}}/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "testuser",
+  "password": "TestPassword123!"
+}
+
+###
+
+# 3. Get User Info (Protected, Requires JWT Token)
+GET {{MovieAPI_HostAddress}}/api/auth/userinfo
+Authorization: Bearer {{JWT_Token}}
+
+###
+
+# 4. Get Movie List
+GET {{MovieAPI_HostAddress}}/api/movies/list
+Accept: application/json
+
+###
+
+# 5. Search for Movies
+GET {{MovieAPI_HostAddress}}/api/movies/search/{query}
+Accept: application/json
+
+###
+
+# 6. Get Movie Details by Movie ID
+GET {{MovieAPI_HostAddress}}/api/movies/{movieId}
+Accept: application/json
+
+###
+
+# 7. Get Favourite Movies (Protected, Requires JWT Token)
+GET {{MovieAPI_HostAddress}}/api/movies/favourites
+Authorization: Bearer {{JWT_Token}}
+
+###
+
+# 8. Add a Movie to Favourites (Protected, Requires JWT Token)
+POST {{MovieAPI_HostAddress}}/api/movies/favourite/{movieId}
+Authorization: Bearer {{JWT_Token}}
+
+###
+
+# 9. Remove a Movie from Favourites (Protected, Requires JWT Token)
+DELETE {{MovieAPI_HostAddress}}/api/movies/favourite/{movieId}
+Authorization: Bearer {{JWT_Token}}
+
+###
