@@ -22,26 +22,26 @@ namespace MovieAPI.Controllers
         [HttpGet]
         public async Task<IActionResult> GetUserFavourites(int page = 1)
         {
-            var userId = GetUserIdFromToken();
-            if (userId == null)
+            var cognitoUserId = GetCognitoUserIdFromToken();
+            if (cognitoUserId == null)
             {
                 return Unauthorized("User ID not found.");
             }
 
-            var favourites = await _favouriteService.GetFavouritesForUserAsync((int)userId, page);
+            var favourites = await _favouriteService.GetFavouritesForUserAsync(cognitoUserId, page);
             return Ok(favourites);
         }
 
         [HttpPost("{movieId}")]
         public async Task<IActionResult> AddToFavourites(int movieId)
         {
-            var userId = GetUserIdFromToken();
-            if (userId == null)
+            var cognitoUserId = GetCognitoUserIdFromToken();
+            if (cognitoUserId == null)
             {
                 return Unauthorized("User ID not found.");
             }
 
-            var result = await _favouriteService.AddToFavouritesAsync((int)userId, movieId);
+            var result = await _favouriteService.AddToFavouritesAsync(cognitoUserId, movieId);
 
             if (!result)
             {
@@ -54,13 +54,13 @@ namespace MovieAPI.Controllers
         [HttpDelete("{movieId}")]
         public async Task<IActionResult> RemoveFromFavourites(int movieId)
         {
-            var userId = GetUserIdFromToken();
-            if (userId == null)
+            var cognitoUserId = GetCognitoUserIdFromToken();
+            if (cognitoUserId == null)
             {
                 return Unauthorized("User ID not found.");
             }
 
-            var result = await _favouriteService.RemoveFromFavouritesAsync((int)userId, movieId);
+            var result = await _favouriteService.RemoveFromFavouritesAsync(cognitoUserId, movieId);
 
             if (!result)
             {
@@ -70,18 +70,10 @@ namespace MovieAPI.Controllers
             return Ok("Removed from favourites.");
         }
 
-        private int? GetUserIdFromToken()
+        private string GetCognitoUserIdFromToken()
         {
-            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
-
-            if (int.TryParse(userIdClaim, out int userId))
-            {
-                return userId;
-            }
-
-            return null;
+            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == "client_id")?.Value;
+            return userIdClaim;
         }
-
-
     }
 }

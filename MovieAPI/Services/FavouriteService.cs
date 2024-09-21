@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using System.Linq;
-using MovieAPI.Data;
+﻿using MovieAPI.Data;
 using MovieAPI.Models;
+using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace MovieAPI.Services
 {
@@ -16,11 +16,14 @@ namespace MovieAPI.Services
             _dbContext = dbContext;
         }
 
-        public async Task<IEnumerable<Movie>> GetFavouritesForUserAsync(int userId, int page)
+        public async Task<IEnumerable<Movie>> GetFavouritesForUserAsync(string cognitoUserId, int page)
         {
+            var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.CognitoUserId == cognitoUserId);
+            if (user == null) return null;
+
             return await _dbContext.Favourites
                 .Include(f => f.Movie)
-                .Where(f => f.UserId == userId)
+                .Where(f => f.UserId == user.Id)
                 .OrderBy(f => f.Id)
                 .Skip((page - 1) * 10)
                 .Take(10)
@@ -28,19 +31,22 @@ namespace MovieAPI.Services
                 .ToListAsync();
         }
 
-        public async Task<bool> AddToFavouritesAsync(int userId, int movieId)
+        public async Task<bool> AddToFavouritesAsync(string cognitoUserId, int movieId)
         {
+            var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.CognitoUserId == cognitoUserId);
+            if (user == null) return false;
+
             var existingFavourite = await _dbContext.Favourites
-                .FirstOrDefaultAsync(f => f.UserId == userId && f.MovieId == movieId);
+                .FirstOrDefaultAsync(f => f.UserId == user.Id && f.MovieId == movieId);
 
             if (existingFavourite != null)
             {
-                return false;
+                return false; // Movie is already in favourites
             }
 
             var favourite = new Favourite
             {
-                UserId = userId,
+                UserId = user.Id,
                 MovieId = movieId
             };
 
@@ -50,14 +56,17 @@ namespace MovieAPI.Services
             return true;
         }
 
-        public async Task<bool> RemoveFromFavouritesAsync(int userId, int movieId)
+        public async Task<bool> RemoveFromFavouritesAsync(string cognitoUserId, int movieId)
         {
+            var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.CognitoUserId == cognitoUserId);
+            if (user == null) return false;
+
             var favourite = await _dbContext.Favourites
-                .FirstOrDefaultAsync(f => f.UserId == userId && f.MovieId == movieId);
+                .FirstOrDefaultAsync(f => f.UserId == user.Id && f.MovieId == movieId);
 
             if (favourite == null)
             {
-                return false;
+                return false; // Favourite not found
             }
 
             _dbContext.Favourites.Remove(favourite);
