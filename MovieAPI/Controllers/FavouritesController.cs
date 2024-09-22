@@ -72,7 +72,7 @@ namespace MovieAPI.Controllers
 
         private string GetCognitoUserIdFromToken()
         {
-            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == "client_id")?.Value;
+            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == "username")?.Value;
             return userIdClaim;
         }
     }
